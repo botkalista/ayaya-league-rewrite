@@ -1,0 +1,19 @@
+{
+  "name": "ayaya-league-rewrite",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@types/node": "^18.14.6",
+    "memoryjs": "^3.5.0",
+    "node-addon-api": "^6.0.0"
+  },
+  "scripts": {
+    "rebuild": "cd scripts & rebuild.bat",
+    "rebuild_memoryjs": "cd scripts & rebuild_memoryjs.bat",
+    "start": "cd scripts & run.bat"
+  },
+  "keywords": [],
+  "author": "Emily",
+  "license": "MIT"
+}
