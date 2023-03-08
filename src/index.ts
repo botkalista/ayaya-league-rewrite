@@ -1,32 +1,64 @@
+console.log(process.arch, process.version)
+
+
 import mem from './addons_cpp/mem/Mem';
 import addon from './addons_cpp/injector/Injector';
 
 // console.log(process.arch);
-
 // const inject = addon.inject("EFCT_Target.exe", "C:\\Users\\Emily\\source\\repos\\AyayaDLL\\Debug\\AyayaDLL.dll");
 
+import { BrowserWindow, app, screen } from 'electron';
+
+import { AyayaLeague } from './AyayaLeague';
+import Drawer from './Drawer';
+import Reader from './components/Reader'
+import path from 'path';
+
+app.whenReady().then(main);
+
+function main() {
+
+    const win = new BrowserWindow({
+        x: screen.getPrimaryDisplay().bounds.x,
+        y: screen.getPrimaryDisplay().bounds.y,
+        width: screen.getPrimaryDisplay().bounds.width,
+        height: screen.getPrimaryDisplay().bounds.height,
+        transparent: true,
+        frame: false,
+        skipTaskbar: true,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: true,
+            preload: path.join(__dirname , '../ui/preload.js')
+        },
+    });
+
+    win.setIgnoreMouseEvents(true, { forward: false });
+    win.setAlwaysOnTop(true, 'screen-saver');
+    win.webContents.openDevTools({ mode: 'detach' });
+
+    const file = path.join(__dirname, '../ui/index.html');
+    win.loadFile(file);
+    Drawer.setWindow(win);
+
+    // Reader.attach('League of Legends.exe');
+    // const ayaya = new AyayaLeague();
+
+    coreLoop();
 
 
-import SigFinder from './components/SigFinder';
-
-SigFinder.loadFile('F:\\LeagueReverse\\LeagueDumper-master\\Debug\\League of Legends_exe_PIDce4_League of Legends.exe_CE0000_x86.exe')
 
 
-const client = '8B 0D ? ? ? ? 8A D8 85 C9'
-const options = SigFinder.analyze(client);
-const addr = SigFinder.findAddressFromSig(client, 0xCE0000, options);
+    function coreLoop() {
+        // ayaya.initializeTick();
 
-console.log(options, addr);
+        
 
-console.log(addr.toString(16));
+        setTimeout(() => coreLoop(), 32);
+    }
 
-    // findSignature('8B 0D ? ? ? ? 81 C1 ? ? ? ? 8B 01 FF 50 10 39 43 34')
+}
 
-// const result = [];
-// const base = 0x010052DA - 0xCE0000;
-// for (let i = 0; i < 10; i++) {
-//     const addr = base + i;
-//     result.push(buffer.at(addr).toString(16));
-// }
 
-// console.log(result.join(' '));
+
+

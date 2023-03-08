@@ -2,3 +2,4 @@ node_modules
 src/addons_cpp/build
 web
 node32
+dist

@@ -2,7 +2,8 @@
     "compilerOptions": {
         "module": "NodeNext",
         "esModuleInterop": true,
-        "outDir": "dist",
+        "moduleResolution": "node",
+        "outDir": "dist"
     },
     "include": [
         "src/index.ts"

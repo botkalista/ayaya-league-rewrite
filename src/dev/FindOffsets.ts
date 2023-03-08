@@ -1,6 +1,9 @@
 
 import fs from 'fs';
 
+import SigFinder from '../components/SigFinder';
+SigFinder.loadFile('F:\\LeagueReverse\\LeagueDumper-master\\Debug\\League of Legends_exe_PIDce4_League of Legends.exe_CE0000_x86.exe');
+
 const offsets: [string, string, number][] = [
 
     ['Client', '8B 0D ? ? ? ? 8A D8 85 C9', 0x3172B90],
@@ -10,8 +13,14 @@ const offsets: [string, string, number][] = [
     ['ZoomAmount', '', 0x28],
     ['GameTime', 'F3 0F 11 05 ? ? ? ? 8B 49', 0x316B268],
 
+    ['Renderer', 'A1 ? ? ? ? 56 57 BF ? ? ? ? 8B', 0x319E770],
+    ['RendererWidth', '', 0x8],
+    ['RendererHeight', '', 0xc],
+    ['ViewMatrix', 'B9 ? ? ? ? E8 ? ? ? ? B9 ? ? ? ? E8 ? ? ? ? B9 ? ? ? ? ', 0x3198DB8],
+
     ['ObjectManager', '8B 0D ? ? ? ? 89 7C 24 14', 0x18D4A34],
     ['HeroList', '89 44 24 18 A1 ? ? ? ? 53 55', 0x18D4AD4],
+    ['MinionList', 'A3 ? ? ? ? E8 ? ? ? ? 83 C4 04 85 C0 74 32', 0x252218C],
     ['MissileList', '8B 0D ? ? ? ? 8D 44 24 1C 50', 0x3172B3C],
 
     ['Missile_StartPos', '', 0x2E0],
@@ -117,47 +126,50 @@ const offsets: [string, string, number][] = [
 ]
 
 
-import SigFinder from '../components/SigFinder';
-SigFinder.loadFile('F:\\LeagueReverse\\LeagueDumper-master\\Debug\\League of Legends_exe_PIDce4_League of Legends.exe_CE0000_x86.exe');
+const [bin, file, arg1, arg2, arg3] = process.argv;
 
-main()
 
-function hex(num) {
-    return `0x${num.toString(16).toUpperCase()}`;
+if (arg1 == 'check') {
+    if (arg2 == 'all') {
+        checkAll();
+    } else {
+        checkSingle(arg2);
+    }
+} else if (arg1 == 'generate') {
+    generate();
 }
 
-function main() {
 
-    //  const type = SigFinder.analyze('E8 ? ? ? ? EB 07 8B 01');
-    //  console.log(type);
-    //  const data = SigFinder.findAddressFromSig('E8 ? ? ? ? EB 07 8B 01', 0xCE0000, { ...type, debug: true });
-    //  console.log(hex(data));
-    //  console.log(hex(0x54AA30));
+function hex(num) { return `0x${num.toString(16).toUpperCase()}`; }
 
-    // return
-    // for (const offset of offsets) {
+function checkAll() {
+    for (const offset of offsets) {
+        const [name, sig, addr] = offset;
+        if (sig.length == 0) continue;
+        const result = SigFinder.analyze(sig)
+        if (result) {
+            const address = SigFinder.findAddressFromSig(sig, 0xCE0000, result);
+            if (address == addr) {
+                console.log('\t OK \t', name);
+            } else {
+                console.log('\t ERR \t', name, '\t\t', sig, '\t', hex(address), '\t', hex(addr));
+            }
+        } else {
+            console.log('\t NOT \t', name, '\t', sig, '\t');
+        }
+    }
+}
 
-    //     const [name, sig, addr] = offset;
+function checkSingle(signature) {
+    console.log('Checking', signature);
+    const type = SigFinder.analyze(signature);
+    console.log(type);
+    const data = SigFinder.findAddressFromSig(signature, 0xCE0000, { ...type, debug: true });
+    console.log(data);
+    console.log(hex(data));
+}
 
-    //     if (sig.length == 0) continue;
-
-    //     const result = SigFinder.analyze(sig)
-
-    //     if (result) {
-    //         const address = SigFinder.findAddressFromSig(sig, 0xCE0000, result);
-
-    //         if (address == addr) {
-    //             console.log('\t OK \t', name);
-    //         } else {
-    //             console.log('\t ERR \t', name, '\t\t', sig, '\t', hex(address), '\t', hex(addr));
-    //         }
-
-    //     } else {
-    //         console.log('\t NOT \t', name, '\t', sig, '\t');
-    //     }
-
-    // }
-
+function generate() {
     const result: string[] = ['export class Offsets {',];
     for (const offset of offsets) {
         const [name, sig, addr] = offset;

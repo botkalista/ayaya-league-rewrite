@@ -65,13 +65,14 @@ class SigFinder {
             return val;
         }
     }
-    analyze(signature: string): FindOptions {
+    analyze(signature: string): FindOptions | undefined {
 
         // Simple DWORD
         const dword = signature.indexOf('8B 0D ?');
         if (dword > -1) {
             const groups = this.groupPlaceholders(signature);
             const group = groups.find(e => e.index >= dword);
+            if (!group) return;
             return { method: 'DEFAULT', skip: Math.max(groups.indexOf(group) - 1, 0) }
         }
 
@@ -80,6 +81,7 @@ class SigFinder {
         if (dword_mov > -1) {
             const groups = this.groupPlaceholders(signature);
             const group = groups.find(e => e.index >= dword_mov);
+            if (!group) return;
             return { method: 'DEFAULT', skip: Math.max(groups.indexOf(group) - 1, 0) }
         }
 
@@ -88,6 +90,7 @@ class SigFinder {
         if (dword_movss > -1) {
             const groups = this.groupPlaceholders(signature);
             const group = groups.find(e => e.index >= dword_movss);
+            if (!group) return;
             return { method: 'DEFAULT', skip: Math.max(groups.indexOf(group) - 1, 0) }
         }
 
@@ -96,6 +99,7 @@ class SigFinder {
         if (dword_mov_eax > -1) {
             const groups = this.groupPlaceholders(signature);
             const group = groups.find(e => e.index >= dword_mov_eax);
+            if (!group) return;
             return { method: 'DEFAULT', skip: Math.max(groups.indexOf(group) - 1, 0) }
         }
 
@@ -104,10 +108,11 @@ class SigFinder {
         if (dword_call > -1) {
             const groups = this.groupPlaceholders(signature);
             const group = groups.find(e => e.index >= dword_call);
+            if (!group) return;
             return { method: 'FUNCTION', skip: Math.max(groups.indexOf(group) - 1, 0) }
         }
 
-
+        return undefined;
     }
 }
 const instance = new SigFinder();

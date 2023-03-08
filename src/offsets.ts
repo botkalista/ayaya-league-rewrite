@@ -5,8 +5,13 @@ export class Offsets {
    static ZoomClass = 0x316A6D8;
    static ZoomAmount = 0x28;
    static GameTime = 0x316B268;
+   static Renderer = 0x319E770;
+   static RendererWidth = 0x8;
+   static RendererHeight = 0xC;
+   static ViewMatrix = 0x3198DB8;
    static ObjectManager = 0x18D4A34;
    static HeroList = 0x18D4AD4;
+   static MinionList = 0x252218C;
    static MissileList = 0x3172B3C;
    static Missile_StartPos = 0x2E0;
    static Missile_EndPos = 0x2EC;

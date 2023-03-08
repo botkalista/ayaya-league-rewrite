@@ -12,6 +12,7 @@ class Reader {
         if (this.attached) return;
         const processes = mem.getProcesses()
         const targetProcess = processes.filter(e => e.szExeFile.startsWith(pName))[0];
+        if (!targetProcess) throw Error('Error finding process');
         const process = mem.openProcess(targetProcess.szExeFile);
         this.handle = process.handle;
         this.baseAddress = process.modBaseAddr;
@@ -25,6 +26,10 @@ class Reader {
 
     read<T>(address: number, type: string, fromBase: boolean = false): T {
         return mem.readMemory(this.handle, (fromBase ? this.baseAddress : 0) + address, type);
+    }
+
+    readBuffer(address: number, size: number, fromBase: boolean = false) {
+        return mem.readBuffer(this.handle, (fromBase ? this.baseAddress : 0) + address, size)
     }
 
     readByte(address: number, fromBase: boolean = false) {
@@ -42,7 +47,6 @@ class Reader {
     readString(address: number, fromBase: boolean = false) {
         return this.read<string>(address, "string", fromBase);
     }
-
 
 }
 
