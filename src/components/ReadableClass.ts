@@ -1,7 +1,6 @@
 import reader from './Reader';
 
 export abstract class ReadableClass {
-    public reader = reader;
     constructor(public address: number) { }
     read<T>(offset: number, type: string): T {
         return reader.read(this.address + offset, type, false);

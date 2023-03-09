@@ -1,10 +1,6 @@
-console.log(process.arch, process.version)
-
-
 import mem from './addons_cpp/mem/Mem';
 import addon from './addons_cpp/injector/Injector';
 
-// console.log(process.arch);
 // const inject = addon.inject("EFCT_Target.exe", "C:\\Users\\Emily\\source\\repos\\AyayaDLL\\Debug\\AyayaDLL.dll");
 
 import { BrowserWindow, app, screen } from 'electron';
@@ -13,6 +9,8 @@ import { AyayaLeague } from './AyayaLeague';
 import Drawer from './Drawer';
 import Reader from './components/Reader'
 import path from 'path';
+
+import ScriptsManager from './components/ScriptsManager';
 
 app.whenReady().then(main);
 
@@ -29,7 +27,7 @@ function main() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: true,
-            preload: path.join(__dirname , '../ui/preload.js')
+            preload: path.join(__dirname, '../ui/preload.js')
         },
     });
 
@@ -46,13 +44,12 @@ function main() {
 
     coreLoop();
 
-
-
+    ScriptsManager.loadScripts(path.join(__dirname, '../userscripts'));
 
     function coreLoop() {
         // ayaya.initializeTick();
 
-        
+        ScriptsManager.scripts.forEach(script => script.internalFunctions.onTick(script.core));
 
         setTimeout(() => coreLoop(), 32);
     }
