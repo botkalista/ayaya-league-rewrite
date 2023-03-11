@@ -17,12 +17,14 @@
     "offsets": "ts-node src/dev/FindOffsets",
     "start": "tsc & electron dist/index.js",
     "start-slim": "electron dist/index.js",
+    "test-ui": "electron tests/TestGraphic.js",
     "generate-script-types": "tsc src/ScriptCore.ts --declaration --target es6 --emitDeclarationOnly --moduleResolution node --outFile types/ScriptCoreTypes"
   },
   "keywords": [],
   "author": "Emily",
   "license": "MIT",
   "devDependencies": {
-    "@types/electron": "^1.6.10"
+    "@types/electron": "^1.6.10",
+    "@types/p5": "^1.5.0"
   }
 }

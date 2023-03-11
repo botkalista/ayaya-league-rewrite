@@ -1,0 +1,21 @@
+html {
+  /* font-family: Roboto; */
+  font-family: 'SF Pro Display';
+}
+
+html, body, #app {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+}
+
+:root {
+  --settings-bg: #f1f1f6;
+  --setting-bg: #ffffff;
+  --setting-color: #000000;
+  --settings-color-group: #66666a;
+  --settings-color2: #b6b6ba;
+  --settings-color3: #0156ff;
+  --settings-color4: #31bf55;
+}

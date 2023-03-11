@@ -4,6 +4,7 @@ import vm from 'vm';
 import path from 'path';
 
 import ScriptCore from '../ScriptCore';
+import Drawer from '../Drawer';
 import type { AyayaLeague } from '../AyayaLeague';
 
 type Script = {
@@ -32,6 +33,7 @@ class ScriptsManager {
     private createCore(script: Script) {
         const core: ScriptCore = {
             game: this.ayayaLeague,
+            drawer: Drawer,
             onTick: (script_onTick) => this.registerScriptTick(script, script_onTick)
         }
         return core;
