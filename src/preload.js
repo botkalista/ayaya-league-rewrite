@@ -7,5 +7,6 @@ contextBridge.exposeInMainWorld('AyayaApi', {
         const result = ipcRenderer.sendSync('settings');
         return result;
     },
-    getSize: () => ipcRenderer.sendSync('size')
+    getSize: () => ipcRenderer.sendSync('size'),
+    changeSetting: (setting, value) => ipcRenderer.sendSync('set-setting', setting, value),
 });

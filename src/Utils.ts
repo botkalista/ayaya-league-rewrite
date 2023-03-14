@@ -1,5 +1,5 @@
 import { Vector2, Vector3, Vector4 } from "./models/Vector";
-import math from 'math';
+import * as math from 'mathjs';
 
 export function worldToScreen(pos: Vector3, screenSize: Vector2, viewProjMatrix: number[]) {
     const out = Vector2.zero;

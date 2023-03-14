@@ -4,8 +4,10 @@ import * as StructureReader from './components/StructureReader';
 import { Entity } from './models/Entity';
 import { Vector2, Vector3 } from './models/Vector';
 import { Offsets } from './offsets';
-import math from 'math';
+import * as math from 'mathjs';
 import { matrixToArray, worldToScreen } from './Utils';
+
+import internal from './components/Internal';
 
 type AyayaLeagueCache = {
     renderer: number,
@@ -35,11 +37,26 @@ export class AyayaLeague {
         const projMatrix = StructureReader.readMatrix(Offsets.ViewMatrix + 0x40);
         const viewProjMatrix = math.multiply(viewMatrix, projMatrix);
         const matrix = matrixToArray(viewProjMatrix);
-        
+
         this.cache.matrix = matrix;
         this.cache.gameTime = Reader.readFloat(Offsets.GameTime, true);
     }
 
+    get internal() {
+        return {
+            printChat: (msg: string) => internal.callPrintChat(msg)
+        }
+    }
+
+    get me() {
+        const aLocalPlayer = Reader.readInt(Offsets.LocalPlayer, true);
+        const localPlayer = new Entity(aLocalPlayer, this);
+        return localPlayer;
+    }
+
+    get gameTime() {
+        return Reader.readFloat(Offsets.GameTime, true);
+    }
 
     worldToScreen(gamePos: Vector3) { return worldToScreen(gamePos, this.cache.screen, this.cache.matrix); }
 

@@ -1,6 +1,6 @@
 
 import Reader from './Reader';
-import math from 'math';
+import * as math from 'mathjs';
 
 export function readVTable(address: number): number[] {
     const result: number[] = [];

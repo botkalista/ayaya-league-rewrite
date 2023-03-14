@@ -3,13 +3,22 @@
     <div class="sTitle">{{ group.title }}</div>
     <div class="allsettings">
       <div class="sContent" v-for="setting of group.settings">
-        <div v-if="setting.type == 'none'" style="height: 32px; align-items:center;display: flex;">
+        <div
+          v-if="setting.type == 'none'"
+          style="height: 32px; align-items: center; display: flex"
+        >
           <div>{{ setting.text }}</div>
         </div>
 
         <div
           v-if="setting.type == 'text'"
-          style="display: flex; width: 100%; height: 32px; align-items:center; justify-content: space-between"
+          style="
+            display: flex;
+            width: 100%;
+            height: 32px;
+            align-items: center;
+            justify-content: space-between;
+          "
         >
           <div>{{ setting.text }}</div>
           <div>{{ setting.value }}</div>
@@ -23,6 +32,9 @@
 
         <setting-input v-if="setting.type == 'input'" :setting="setting">
         </setting-input>
+
+        <setting-button v-if="setting.type == 'button'" :setting="setting">
+        </setting-button>
 
         <!-- <div>{{ setting.text }}</div>
         <div v-if="setting.type == 'none'"></div>
@@ -52,9 +64,10 @@ import type { SettingsGroup } from "../../../src/models/renderer/SettingsGroup";
 import SettingInput from "./SettingInput.vue";
 import SettingNumber from "./SettingNumber.vue";
 import SettingBoolean from "./SettingBoolean.vue";
+import SettingButton from "./SettingButton.vue";
 
 export default defineComponent({
-  components: { SettingInput, SettingNumber, SettingBoolean },
+  components: { SettingInput, SettingNumber, SettingBoolean, SettingButton },
   name: "Group",
   props: { groups: Object as PropType<SettingsGroup> },
 });

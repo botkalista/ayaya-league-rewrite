@@ -1,7 +1,7 @@
 <template>
   <div class="setting-boolean">
     <div>{{ setting.text }}</div>
-    <el-switch v-model="setting.value" />
+    <el-switch @change="onChange(setting)" v-model="setting.value" />
   </div>
 </template>
 
@@ -10,9 +10,18 @@ import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import type { SettingBoolean } from "../../../src/models/renderer/SettingsGroup";
 
+declare module AyayaApi {
+  function changeSetting(id: string, value: any);
+}
+
 export default defineComponent({
   name: "SettingBoolean",
   props: { setting: Object as PropType<SettingBoolean> },
+  methods: {
+    onChange(setting: SettingBoolean) {
+      AyayaApi.changeSetting(setting.id, setting.value);
+    },
+  },
 });
 </script>
 

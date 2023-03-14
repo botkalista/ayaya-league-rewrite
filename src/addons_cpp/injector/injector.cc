@@ -34,7 +34,6 @@ uint32_t find_process(std::wstring name) {
     CloseHandle(process_snap);
 
     std::cout << result << std::endl;
-    ;
 
     return result;
 }
@@ -147,10 +146,10 @@ HANDLE inject(uint32_t pid, std::string dll_path) {
         return NULL;
     }
 
-    WaitForSingleObject(remoteThread, INFINITE);
-    CloseHandle(remoteThread);
-    VirtualFreeEx(handle, remotePathSpace, 0, MEM_RELEASE);
-    CloseHandle(handle);
+    // WaitForSingleObject(remoteThread, INFINITE);
+    // CloseHandle(remoteThread);
+    // VirtualFreeEx(handle, remotePathSpace, 0, MEM_RELEASE);
+    // CloseHandle(handle);
     printf("[+] Injected successfully!\n");
     return remoteThread;
 }
@@ -233,9 +232,20 @@ Napi::Value GetFunctionAddress(const Napi::CallbackInfo &info) {
     return result;
 }
 
+Napi::Value GetLeaguePid(const Napi::CallbackInfo &info) {
+    Napi::Env env = info.Env();
+    
+    uint32_t processId = find_process(L"League of Legends.exe");
+
+    Napi::Number result = Napi::Number::New(env, (double)(processId));
+    return result;
+}
+
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "inject"), Napi::Function::New(env, ApiInject));
     exports.Set(Napi::String::New(env, "getFunctionAddress"), Napi::Function::New(env, GetFunctionAddress));
+    exports.Set(Napi::String::New(env, "getLeaguePID"), Napi::Function::New(env, GetLeaguePid));
     return exports;
 }
 

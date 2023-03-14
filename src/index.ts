@@ -1,7 +1,6 @@
 import mem from './addons_cpp/mem/Mem';
 import addon from './addons_cpp/injector/Injector';
-
-// const inject = addon.inject("EFCT_Target.exe", "C:\\Users\\Emily\\source\\repos\\AyayaDLL\\Debug\\AyayaDLL.dll");
+import internal from './components/Internal';
 
 import { BrowserWindow, app, screen, ipcMain } from 'electron';
 
@@ -13,6 +12,31 @@ import path from 'path';
 import ScriptsManager from './components/ScriptsManager';
 
 app.whenReady().then(main);
+
+function waitForLeagueOpen() {
+    return new Promise(async resolve => {
+        let leaguePID;
+        do {
+            leaguePID = addon.getLeaguePID();
+            await new Promise(r => setTimeout(r, 2000));
+        } while (leaguePID == 0)
+        resolve(leaguePID);
+    });
+}
+
+function waitForEnterGame(ayaya: AyayaLeague) {
+    return new Promise<void>(async resolve => {
+        let gameTime;
+        do {
+            gameTime = ayaya.gameTime;
+            console.log({ gameTime });
+            await new Promise(r => setTimeout(r, 2000));
+        } while (gameTime <= 0)
+        resolve();
+    });
+}
+
+
 
 function main() {
 
@@ -31,9 +55,11 @@ function main() {
         },
     });
 
+    console.log(screen.getPrimaryDisplay());
+
     win.setIgnoreMouseEvents(true, { forward: true });
     win.setAlwaysOnTop(true, 'screen-saver');
-    win.webContents.openDevTools({ mode: 'detach' });
+
 
     ipcMain.on('set-ignore-mouse-events', (event, ignore: boolean, forward: boolean) => {
         BrowserWindow.fromWebContents(event.sender).setIgnoreMouseEvents(ignore, { forward })
@@ -44,35 +70,54 @@ function main() {
     });
 
     ipcMain.on('settings', (event) => {
-        event.returnValue = [
-            {
-                title: 'test',
-                settings: [
-                    { text: 'Active', value: false, type: 'boolean' }
-                ],
-                description: 'test111'
-            }];
+        const settings = ScriptsManager.getAllSettings();
+        event.returnValue = settings;
+    });
+
+    ipcMain.on('set-setting', (event, setting_id: string, value: any) => {
+        ScriptsManager.setSetting(setting_id, value);
+        event.returnValue = true;
     });
 
     // const file = path.join(__dirname, '../ui/index.html');
     // win.loadFile(file);
-    win.loadURL('http://localhost:5173')
-    Drawer.setWindow(win);
 
-    // Reader.attach('League of Legends.exe');
-    // const ayaya = new AyayaLeague();
 
-    coreLoop();
+    async function start() {
+        ScriptsManager.loadScripts(path.join(__dirname, '../userscripts'));
 
-    ScriptsManager.loadScripts(path.join(__dirname, '../userscripts'));
 
-    function coreLoop() {
-        // ayaya.initializeTick();
+        win.loadURL('http://localhost:5173')
+        win.webContents.openDevTools({ mode: 'detach' });
+        Drawer.setWindow(win);
 
-        ScriptsManager.scripts.forEach(script => script.internalFunctions.onTick(script.core));
+        await waitForLeagueOpen();
 
-        setTimeout(() => coreLoop(), 32);
+        Reader.attach('League of Legends.exe');
+
+        const inject = addon.inject("League of Legends.exe", "C:\\Users\\Emily\\source\\repos\\AyayaDLL\\Debug\\AyayaDLL.dll");
+        await new Promise(r => setTimeout(r, 2000));
+
+        const ayaya = new AyayaLeague();
+        ScriptsManager.setAyayaLeague(ayaya);
+
+        await waitForEnterGame(ayaya);
+        await new Promise(r => setTimeout(r, 2000));
+
+        internal.openPipe('myPipe', async () => {
+            ScriptsManager.scripts.forEach(script => script.internalFunctions.onLoad?.());
+            console.log('CORE LOOP')
+            coreLoop();
+        });
+        function coreLoop() {
+            ayaya.initializeTick();
+            ScriptsManager.scripts.forEach(script => script.internalFunctions.onTick?.());
+            setTimeout(() => coreLoop(), 320);
+        }
     }
+
+    start();
+
 
 }
 
