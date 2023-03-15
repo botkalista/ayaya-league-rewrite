@@ -31,12 +31,10 @@ function waitForEnterGame(ayaya: AyayaLeague) {
             gameTime = ayaya.gameTime;
             console.log({ gameTime });
             await new Promise(r => setTimeout(r, 2000));
-        } while (gameTime <= 0)
+        } while (gameTime <= 5)
         resolve();
     });
 }
-
-
 
 function main() {
 
@@ -44,7 +42,7 @@ function main() {
         x: screen.getPrimaryDisplay().bounds.x,
         y: screen.getPrimaryDisplay().bounds.y,
         width: screen.getPrimaryDisplay().bounds.width,
-        height: screen.getPrimaryDisplay().bounds.height,
+        height: screen.getPrimaryDisplay().bounds.height + 40,
         transparent: true,
         frame: false,
         skipTaskbar: true,
@@ -53,12 +51,13 @@ function main() {
             contextIsolation: true,
             preload: path.join(__dirname, '../src/preload.js')
         },
+        alwaysOnTop: true
     });
 
-    console.log(screen.getPrimaryDisplay());
+    console.log(screen.getPrimaryDisplay().bounds);
 
     win.setIgnoreMouseEvents(true, { forward: true });
-    win.setAlwaysOnTop(true, 'screen-saver');
+    win.setAlwaysOnTop(true, "screen-saver");
 
 
     ipcMain.on('set-ignore-mouse-events', (event, ignore: boolean, forward: boolean) => {
@@ -79,40 +78,52 @@ function main() {
         event.returnValue = true;
     });
 
+    ipcMain.on('reload-scripts', (event) => {
+        ScriptsManager.reloadAll();
+        const settings = ScriptsManager.getAllSettings();
+        event.returnValue = settings;
+    });
+
     // const file = path.join(__dirname, '../ui/index.html');
     // win.loadFile(file);
 
 
-    async function start() {
-        ScriptsManager.loadScripts(path.join(__dirname, '../userscripts'));
-
-
-        win.loadURL('http://localhost:5173')
-        win.webContents.openDevTools({ mode: 'detach' });
-        Drawer.setWindow(win);
-
+    async function start(isRecall = false) {
+        if (!isRecall) {
+            ScriptsManager.loadScripts(path.join(__dirname, '../userscripts'));
+            win.loadURL('http://localhost:5173')
+            win.webContents.openDevTools({ mode: 'detach' });
+            Drawer.setWindow(win);
+        }
+        console.log('Waiting for league...');
         await waitForLeagueOpen();
 
         Reader.attach('League of Legends.exe');
 
         const inject = addon.inject("League of Legends.exe", "C:\\Users\\Emily\\source\\repos\\AyayaDLL\\Debug\\AyayaDLL.dll");
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, 1500));
 
         const ayaya = new AyayaLeague();
         ScriptsManager.setAyayaLeague(ayaya);
+        Drawer.setAyayaLeague(ayaya);
 
         await waitForEnterGame(ayaya);
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, 1000));
 
         internal.openPipe('myPipe', async () => {
             ScriptsManager.scripts.forEach(script => script.internalFunctions.onLoad?.());
             console.log('CORE LOOP')
+            win.setAlwaysOnTop(true, "screen-saver");
             coreLoop();
         });
+        
         function coreLoop() {
+            const isLeagueOpen = addon.getLeaguePID();
+            if (isLeagueOpen == 0) return setTimeout(() => start(true), 1000);
             ayaya.initializeTick();
             ScriptsManager.scripts.forEach(script => script.internalFunctions.onTick?.());
-            setTimeout(() => coreLoop(), 320);
+            Drawer.onDrawThings();
+            setTimeout(() => coreLoop(), 16);
         }
     }
 

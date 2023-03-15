@@ -8,7 +8,7 @@ export type SettingText = { id: string; text: string; type: 'text'; value: strin
 
 export type SettingBoolean = { id: string; text: string; type: 'boolean'; value: boolean; }
 
-export type SettingButton = { id: string; text: string; type: 'button'; }
+export type SettingButton = { id: string; text: string; type: 'button'; click: () => any }
 
 
 export type SettingNumber = {

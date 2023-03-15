@@ -17,7 +17,7 @@ export class Entity extends ReadableClass {
         return reader.readString(ptrName);
     }
 
-    get gamePos(): Vector3 { return Vector3.fromData(reader.read(Offsets.GObject_Pos, 'VEC3', true)); }
+    get gamePos(): Vector3 { return Vector3.fromData(this.read(Offsets.GObject_Pos, 'VEC3')); }
     get screenPos(): Vector2 { return this.ayaya.worldToScreen(this.gamePos); }
     
 

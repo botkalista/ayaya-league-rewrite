@@ -29,3 +29,29 @@ export function matrixToArray(matrix: math.Matrix): number[] {
     }
     return result;
 }
+
+export function getCircle3D(pos: Vector3, points: number, radius: number, screenSize: Vector2, viewProjMatrixArg: number[]): [Vector2, Vector2][] {
+
+    const p = Math.PI * 2 / points;
+    const result: [Vector2, Vector2][] = []
+    for (let a = 0; a < Math.PI * 2; a += p) {
+        const start = new Vector3(
+            radius * Math.cos(a) + pos.x,
+            radius * Math.sin(a) + pos.z,
+            pos.y
+        );
+        const end = new Vector3(
+            radius * Math.cos(a + p) + pos.x,
+            radius * Math.sin(a + p) + pos.z,
+            pos.y
+        );
+        const start2 = new Vector3(start.x, start.z, start.y);
+        const end2 = new Vector3(end.x, end.z, end.y);
+        const startScreen = worldToScreen(start2, screenSize, viewProjMatrixArg);
+        const endScreen = worldToScreen(end2, screenSize, viewProjMatrixArg);
+        result.push([startScreen, endScreen]);
+    }
+
+    return result;
+
+}

@@ -32,9 +32,6 @@ uint32_t find_process(std::wstring name) {
     }
 
     CloseHandle(process_snap);
-
-    std::cout << result << std::endl;
-
     return result;
 }
 

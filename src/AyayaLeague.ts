@@ -25,6 +25,9 @@ export class AyayaLeague {
         this.cache.renderer = renderer;
         const screen = new Vector2(Reader.readInt(renderer + Offsets.RendererWidth), Reader.readInt(renderer + Offsets.RendererHeight));
         this.cache.screen = screen;
+
+        console.log('renderer', renderer);
+        console.log('screen', screen);
     }
 
     initializeTick() {

@@ -8,5 +8,6 @@ contextBridge.exposeInMainWorld('AyayaApi', {
         return result;
     },
     getSize: () => ipcRenderer.sendSync('size'),
+    reloadScripts: () => ipcRenderer.sendSync('reload-scripts'),
     changeSetting: (setting, value) => ipcRenderer.sendSync('set-setting', setting, value),
 });
