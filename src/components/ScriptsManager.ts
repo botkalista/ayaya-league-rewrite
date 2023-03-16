@@ -27,6 +27,7 @@ type Script = {
     },
     internalFunctions: {
         onTick?: () => any,
+        onDraw?: () => any,
         onLoad?: () => any,
         onUnload?: () => any
     }
@@ -175,6 +176,11 @@ class ScriptsManager {
             onTick: (scriptOnTick: CoreCallback) => {
                 script.internalFunctions.onTick = () => {
                     scriptOnTick(getCore());
+                }
+            },
+            onDraw: (scriptOnDraw: CoreCallback) => {
+                script.internalFunctions.onDraw = () => {
+                    scriptOnDraw(getCore());
                 }
             },
             exportSettings: (groups: SettingsGroup[]) => {

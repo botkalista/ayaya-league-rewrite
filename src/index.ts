@@ -116,14 +116,21 @@ function main() {
             win.setAlwaysOnTop(true, "screen-saver");
             coreLoop();
         });
-        
+
+        let nextTickIsLogic = false;
         function coreLoop() {
-            const isLeagueOpen = addon.getLeaguePID();
-            if (isLeagueOpen == 0) return setTimeout(() => start(true), 1000);
-            ayaya.initializeTick();
-            ScriptsManager.scripts.forEach(script => script.internalFunctions.onTick?.());
+            if (nextTickIsLogic) {
+                const isLeagueOpen = addon.getLeaguePID();
+                if (isLeagueOpen == 0) return setTimeout(() => start(true), 1000);
+                nextTickIsLogic = false;
+                ayaya.initializeTick();
+                ScriptsManager.scripts.forEach(script => script.internalFunctions.onTick?.());
+            } else {
+                nextTickIsLogic = true
+            }
+            ScriptsManager.scripts.forEach(script => script.internalFunctions.onDraw?.());
             Drawer.onDrawThings();
-            setTimeout(() => coreLoop(), 16);
+            setTimeout(() => coreLoop(), 12);
         }
     }
 
