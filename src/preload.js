@@ -10,4 +10,5 @@ contextBridge.exposeInMainWorld('AyayaApi', {
     getSize: () => ipcRenderer.sendSync('size'),
     reloadScripts: () => ipcRenderer.sendSync('reload-scripts'),
     changeSetting: (setting, value) => ipcRenderer.sendSync('set-setting', setting, value),
+    requestThingsToDraw: () => ipcRenderer.sendSync('req-things-to-draw')
 });

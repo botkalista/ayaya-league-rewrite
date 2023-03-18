@@ -36,6 +36,8 @@ function waitForEnterGame(ayaya: AyayaLeague) {
     });
 }
 
+let leagueState_open = false;
+
 function main() {
 
     const win = new BrowserWindow({
@@ -84,6 +86,16 @@ function main() {
         event.returnValue = settings;
     });
 
+    ipcMain.on('req-things-to-draw', (event) => {
+        // if (!leagueState_open) return event.returnValue = false;
+        Drawer.onStartDraw();
+        for (const script of ScriptsManager.scripts) {
+            script.internalFunctions.onDraw?.()
+        }
+        Drawer.onEndDraw();
+        event.returnValue = true;
+    });
+
     // const file = path.join(__dirname, '../ui/index.html');
     // win.loadFile(file);
 
@@ -114,24 +126,22 @@ function main() {
             ScriptsManager.scripts.forEach(script => script.internalFunctions.onLoad?.());
             console.log('CORE LOOP')
             win.setAlwaysOnTop(true, "screen-saver");
-            coreLoop();
+            logicLoop();
         });
 
-        let nextTickIsLogic = false;
-        function coreLoop() {
-            if (nextTickIsLogic) {
-                const isLeagueOpen = addon.getLeaguePID();
-                if (isLeagueOpen == 0) return setTimeout(() => start(true), 1000);
-                nextTickIsLogic = false;
-                ayaya.initializeTick();
-                ScriptsManager.scripts.forEach(script => script.internalFunctions.onTick?.());
-            } else {
-                nextTickIsLogic = true
+
+        function logicLoop() {
+            const isLeagueOpen = addon.getLeaguePID();
+            if (isLeagueOpen == 0) {
+                leagueState_open = false;
+                return setTimeout(() => start(true), 1000);
             }
-            ScriptsManager.scripts.forEach(script => script.internalFunctions.onDraw?.());
-            Drawer.onDrawThings();
-            setTimeout(() => coreLoop(), 12);
+            ayaya.initializeTick();
+            leagueState_open = true;
+            ScriptsManager.scripts.forEach(script => script.internalFunctions.onTick?.());
+            setTimeout(() => logicLoop(), 30);
         }
+
     }
 
     start();

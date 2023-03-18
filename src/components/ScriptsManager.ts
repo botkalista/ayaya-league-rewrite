@@ -3,10 +3,13 @@ import fs from 'fs';
 import vm from 'vm';
 import path from 'path';
 
+import addon from '../addons_cpp/injector/Injector';
+
 import ScriptCore from '../ScriptCore';
 import Drawer from '../Drawer';
 import type { AyayaLeague } from '../AyayaLeague';
 import { SettingsGroup } from '../models/renderer/SettingsGroup';
+
 
 
 
@@ -142,8 +145,11 @@ class ScriptsManager {
         const me = this;
 
         function getCore() {
+
             if (script.core && script.core.game && script.core.game.internal && script.core.drawer) {
+
                 return script.core;
+
             } else {
 
                 const newCore: ScriptCore = {
@@ -162,25 +168,32 @@ class ScriptsManager {
 
         const ctx = vm.createContext({
             console,
+            getMousePosition: () => {
+                return addon.getMousePosition();
+            },
             onLoad: (scriptOnLoad: CoreCallback) => {
                 script.internalFunctions.onLoad = () => {
-                    scriptOnLoad(getCore());
+                    const core = getCore();
+                    scriptOnLoad(core);
                 }
             },
             onUnload: (scriptOnUnload: CoreCallback) => {
                 script.internalFunctions.onUnload = () => {
-                    scriptOnUnload(getCore());
+                    const core = getCore();
+                    scriptOnUnload(core);
                     clearInterval(script.heartbeat.interval);
                 }
             },
             onTick: (scriptOnTick: CoreCallback) => {
                 script.internalFunctions.onTick = () => {
-                    scriptOnTick(getCore());
+                    const core = getCore();
+                    scriptOnTick(core);
                 }
             },
             onDraw: (scriptOnDraw: CoreCallback) => {
                 script.internalFunctions.onDraw = () => {
-                    scriptOnDraw(getCore());
+                    const core = getCore();
+                    scriptOnDraw(core);
                 }
             },
             exportSettings: (groups: SettingsGroup[]) => {

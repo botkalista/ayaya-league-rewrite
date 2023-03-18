@@ -3,10 +3,7 @@
     <div class="sTitle">{{ group.title }}</div>
     <div class="allsettings">
       <div class="sContent" v-for="setting of group.settings">
-        <div
-          v-if="setting.type == 'none'"
-          style="height: 32px; align-items: center; display: flex"
-        >
+        <div v-if="setting.type == 'none'" style="height: 32px; align-items: center; display: flex">
           <div>{{ setting.text }}</div>
         </div>
 
@@ -24,17 +21,15 @@
           <div>{{ setting.value }}</div>
         </div>
 
-        <setting-boolean v-if="setting.type == 'boolean'" :setting="setting">
-        </setting-boolean>
+        <setting-boolean v-if="setting.type == 'boolean'" :setting="setting"></setting-boolean>
 
-        <setting-number v-if="setting.type == 'number'" :setting="setting">
-        </setting-number>
+        <setting-number v-if="setting.type == 'number'" :setting="setting"></setting-number>
 
-        <setting-input v-if="setting.type == 'input'" :setting="setting">
-        </setting-input>
+        <setting-input v-if="setting.type == 'input'" :setting="setting"></setting-input>
 
-        <setting-button v-if="setting.type == 'button'" :setting="setting">
-        </setting-button>
+        <setting-button v-if="setting.type == 'button'" :setting="setting"></setting-button>
+
+        <setting-select v-if="setting.type == 'select'" :setting="setting"></setting-select>
 
         <!-- <div>{{ setting.text }}</div>
         <div v-if="setting.type == 'none'"></div>
@@ -49,7 +44,7 @@
 
         <div v-if="setting.type == 'boolean'">
           <el-switch size="default" v-model="setting.value"></el-switch>
-        </div> -->
+        </div>-->
       </div>
     </div>
     <div class="sDesc" v-if="group.description">{{ group.description }}</div>
@@ -65,9 +60,16 @@ import SettingInput from "./SettingInput.vue";
 import SettingNumber from "./SettingNumber.vue";
 import SettingBoolean from "./SettingBoolean.vue";
 import SettingButton from "./SettingButton.vue";
+import SettingSelect from "./SettingSelect.vue";
 
 export default defineComponent({
-  components: { SettingInput, SettingNumber, SettingBoolean, SettingButton },
+  components: {
+    SettingInput,
+    SettingSelect,
+    SettingNumber,
+    SettingBoolean,
+    SettingButton,
+  },
   name: "Group",
   props: { groups: Object as PropType<SettingsGroup> },
 });

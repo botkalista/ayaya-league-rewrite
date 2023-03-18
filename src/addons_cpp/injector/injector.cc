@@ -231,18 +231,31 @@ Napi::Value GetFunctionAddress(const Napi::CallbackInfo &info) {
 
 Napi::Value GetLeaguePid(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
-    
+
     uint32_t processId = find_process(L"League of Legends.exe");
 
     Napi::Number result = Napi::Number::New(env, (double)(processId));
     return result;
 }
 
+Napi::Value GetMousePosition(const Napi::CallbackInfo &info) {
+    Napi::Env env = info.Env();
+
+    POINT p;
+    if (GetCursorPos(&p)) {
+        Napi::Object result = Napi::Object::New(env);
+        result.Set("x", p.x);
+        result.Set("y", p.y);
+        return result;
+    }
+    return Napi::Number::New(env, 0);
+}
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "inject"), Napi::Function::New(env, ApiInject));
     exports.Set(Napi::String::New(env, "getFunctionAddress"), Napi::Function::New(env, GetFunctionAddress));
     exports.Set(Napi::String::New(env, "getLeaguePID"), Napi::Function::New(env, GetLeaguePid));
+    exports.Set(Napi::String::New(env, "getMousePosition"), Napi::Function::New(env, GetMousePosition));
     return exports;
 }
 

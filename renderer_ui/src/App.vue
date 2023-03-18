@@ -1,13 +1,7 @@
-
 <template>
   <div class="overlay" id="overlay"></div>
 
-  <div
-    class="settings"
-    v-if="showSettings"
-    @mouseenter="onMouseEnter"
-    @mouseleave="onMouseLeave"
-  >
+  <div class="settings" v-if="showSettings" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
     <group :groups="groups"></group>
 
     <div class="base-settings">
@@ -16,32 +10,24 @@
           <el-button
             @click="reloadScripts()"
             style="width: 200px; border-radius: 8px"
-          >
-            Reload scripts
-          </el-button>
+          >Reload scripts</el-button>
         </div>
       </div>
     </div>
   </div>
 
-  <div
-    class="static-menu"
-    @mouseenter="onMouseEnter"
-    @mouseleave="onMouseLeave"
-  >
+  <div class="static-menu" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
     <el-button
       @click="showSettings = !showSettings"
       :plain="showSettings"
       type="primary"
       size="small"
-    >
-      Settings
-    </el-button>
+    >Settings</el-button>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, watch } from "vue";
+import { defineComponent, reactive } from "vue";
 import Group from "./components/Group.vue";
 
 const state = reactive({
@@ -55,6 +41,7 @@ declare module AyayaApi {
   function getSize(): { x: number; y: number; width: number; height: number };
   function onAction(cb: (...args: any) => any): void;
   function reloadScripts(): any;
+  function requestThingsToDraw(): any;
 }
 
 import Drawer from "./drawer";
@@ -68,15 +55,40 @@ export default defineComponent({
     const settings = AyayaApi.getSettings();
     state.groups = settings;
 
-    Drawer.createCanvas(function (p) {
-      const sz = AyayaApi.getSize();
-      const canvas = p.createCanvas(sz.width, sz.height + 40);
-      canvas.parent("overlay");
-    });
+    // console.log(state.groups);
+
+    const render_fps_setting = state.groups[0].settings.find(
+      (e) => e.id == "render_fps"
+    );
+
+    Drawer.createCanvas(
+      function (p) {
+        const sz = AyayaApi.getSize();
+        const canvas = p.createCanvas(sz.width, sz.height + 40);
+        canvas.parent("overlay");
+      },
+      function (p) {
+        p.frameRate(parseInt(render_fps_setting.value));
+        // console.log("START DRAW");
+        AyayaApi.requestThingsToDraw();
+        // Drawer.drawText(
+        //   p.frameRate() + " " + render_fps_setting.value,
+        //   200,
+        //   200,
+        //   20
+        // );
+        // console.log("END DRAW");
+      }
+    );
 
     AyayaApi.onAction((event, args) => {
-      const fn = args.splice(0,1)[0];
-      Drawer[fn](...args);
+      Drawer.clear();
+      const actions = args;
+      for (const action of actions) {
+        const fn = action.splice(0, 1)[0];
+        // console.log(Date.now(), fn);
+        Drawer[fn](...action);
+      }
     });
   },
   methods: {
@@ -93,8 +105,6 @@ export default defineComponent({
   },
 });
 </script>
-
-
 
 <style scoped>
 .base-settings {

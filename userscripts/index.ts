@@ -1,5 +1,5 @@
+import { exportSettings, getMousePosition, onDraw, onLoad, onTick, onUnload, settings } from "../types/ScriptCoreFn";
 import { SettingBoolean } from "models/renderer/SettingsGroup";
-import { exportSettings, onLoad, onTick, onUnload, settings } from "../types/ScriptCoreFn";
 
 
 exportSettings([
@@ -8,7 +8,17 @@ exportSettings([
         title: 'Core',
         settings: [
             { id: 'active', type: 'boolean', text: 'Active', value: false },
-            { id: 'exec', type: 'button', text: 'CLICK_ME', click: () => { console.log('Clicked') } }
+            { id: 'exec', type: 'button', text: 'CLICK_ME', click: () => { console.log('Clicked') } },
+            {
+                id: 'render_fps', type: 'select', options: [
+                    { text: '15', value: 15 },
+                    { text: '30', value: 30 },
+                    { text: '60', value: 60 },
+                    { text: '90', value: 90 },
+                ],
+                text: 'Draw FPS',
+                value: 60
+            }
         ],
         description: 'Core script, used to test some settings',
     }
@@ -23,14 +33,16 @@ onUnload(() => {
     console.log('UN-LOADED');
 })
 
-onTick(core => {
-    const me = core.game.me;
-    const pos = me.gamePos;
-    core.drawer.drawCircle3dAt(pos, 300, 50, 0xFF0000);
 
+onDraw(core => {
+    // core.drawer.drawCircle3dAt(core.game.me.gamePos, 300, 50, 0xFF0000);
     const active = settings.getSetting<SettingBoolean>('core', 'active')?.value;
-    if (active) {
-        core.game.internal.printChat('uwu')
-    }
+    if (!active) return;
+    const pos = getMousePosition();
+    core.drawer.drawCircle(pos.x, pos.y, 200, 0xFF0000, 3);
+    // core.drawer.drawText("TEST", 300, 300, 20);
+});
+
+onTick(core => {
 
 });
