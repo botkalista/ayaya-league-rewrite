@@ -112,7 +112,8 @@ function main() {
 
         Reader.attach('League of Legends.exe');
 
-        const inject = addon.inject("League of Legends.exe", "C:\\Users\\Emily\\source\\repos\\AyayaDLL\\Debug\\AyayaDLL.dll");
+        const dll_path = path.join(__dirname,'AyayaDLL.dll')
+        const inject = addon.inject("League of Legends.exe", dll_path);
         await new Promise(r => setTimeout(r, 1500));
 
         const ayaya = new AyayaLeague();
