@@ -9,8 +9,11 @@
         <div class="reload">
           <el-button
             @click="reloadScripts()"
-            style="width: 200px; border-radius: 8px"
+            style="width: 140px; border-radius: 8px"
           >Reload scripts</el-button>
+        </div>
+        <div class="reload">
+          <el-button @click="openDevtools()" style="width: 140px; border-radius: 8px">Open devtools</el-button>
         </div>
       </div>
     </div>
@@ -41,7 +44,8 @@ declare module AyayaApi {
   function getSize(): { x: number; y: number; width: number; height: number };
   function onAction(cb: (...args: any) => any): void;
   function reloadScripts(): any;
-  function requestThingsToDraw(): any;
+  function requestThingsToDraw(): any[];
+  function openDevTools(): void;
 }
 
 import Drawer from "./drawer";
@@ -55,22 +59,25 @@ export default defineComponent({
     const settings = AyayaApi.getSettings();
     state.groups = settings;
 
-    // console.log(state.groups);
+    console.log(state.groups);
 
-    const render_fps_setting = state.groups[0].settings.find(
-      (e) => e.id == "render_fps"
-    );
+    const render_fps_setting = state.groups["core.ts"].settings.render_fps;
 
     Drawer.createCanvas(
       function (p) {
         const sz = AyayaApi.getSize();
         const canvas = p.createCanvas(sz.width, sz.height + 40);
         canvas.parent("overlay");
+        getBuffer();
       },
       function (p) {
+        // p.noLoop();
         p.frameRate(parseInt(render_fps_setting.value));
         // console.log("START DRAW");
-        AyayaApi.requestThingsToDraw();
+        // const buffer = AyayaApi.requestThingsToDraw();
+        // console.log(buffer);
+        executeBuffer(lastBuffer);
+        // executeLastMessage();
         // Drawer.drawText(
         //   p.frameRate() + " " + render_fps_setting.value,
         //   200,
@@ -81,15 +88,30 @@ export default defineComponent({
       }
     );
 
-    AyayaApi.onAction((event, args) => {
+    let lastBuffer = [];
+    function getBuffer() {
+      lastBuffer = AyayaApi.requestThingsToDraw();
+      setTimeout(() => getBuffer(), 5);
+    }
+
+    function executeBuffer(buffer: any[]) {
       Drawer.clear();
-      const actions = args;
+      const actions = buffer;
       for (const action of actions) {
         const fn = action.splice(0, 1)[0];
-        // console.log(Date.now(), fn);
-        Drawer[fn](...action);
+        try {
+          Drawer[fn](...action);
+        } catch (ex) {
+          console.log("NOT A FN", fn, action);
+        }
       }
-    });
+    }
+
+    // AyayaApi.onAction((event, args) => {
+    //   lastMessage = args;
+    // });
+
+    AyayaApi.requestThingsToDraw();
   },
   methods: {
     onMouseEnter() {
@@ -101,6 +123,9 @@ export default defineComponent({
     reloadScripts() {
       const newSettings = AyayaApi.reloadScripts();
       state.groups = newSettings;
+    },
+    openDevtools() {
+      AyayaApi.openDevTools();
     },
   },
 });

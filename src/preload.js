@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('AyayaApi', {
     },
     getSize: () => ipcRenderer.sendSync('size'),
     reloadScripts: () => ipcRenderer.sendSync('reload-scripts'),
-    changeSetting: (setting, value) => ipcRenderer.sendSync('set-setting', setting, value),
-    requestThingsToDraw: () => ipcRenderer.sendSync('req-things-to-draw')
+    changeSetting: (path, sid, value) => ipcRenderer.sendSync('set-setting', path, sid, value),
+    requestThingsToDraw: () => ipcRenderer.sendSync('req-things-to-draw'),
+    openDevTools: () => ipcRenderer.send('openDevTools')
 });

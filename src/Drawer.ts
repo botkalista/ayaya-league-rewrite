@@ -14,11 +14,6 @@ export class Drawer {
     setWindow(win: BrowserWindow) { this.win = win; }
     setAyayaLeague(ayaya: AyayaLeague) { this.ayaya = ayaya; }
 
-    private send(...args: any) {
-        if (!this.win) return;
-        this.win.webContents.send('action', args);
-    }
-
     onStartDraw() {
         this.drawBuffer.length = 0;
         this.drawStarted = true;
@@ -26,8 +21,9 @@ export class Drawer {
     onEndDraw() {
         if (!this.drawStarted) return;
         this.drawStarted = false;
-        this.send(...this.drawBuffer);
+        const result = [...this.drawBuffer];
         this.drawBuffer.length = 0;
+        return result;
     }
 
     drawText(text: string, x: number, y: number, size?: number) {

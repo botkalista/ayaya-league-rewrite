@@ -16,7 +16,6 @@ class Drawer {
         }
     }
 
-
     clear() {
         this.p?.clear(0, 0, 0, 0);
     }

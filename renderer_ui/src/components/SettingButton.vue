@@ -1,6 +1,9 @@
 <template>
   <div class="setting-button">
-    <el-button @click="onClick(setting)" style="width: 200px; border-radius: 8px;"> {{ setting.text }} </el-button>
+    <el-button
+      @click="onClick(path, sid, setting)"
+      style="width: 200px; border-radius: 8px;"
+    >{{ setting.text }}</el-button>
   </div>
 </template>
 
@@ -10,15 +13,18 @@ import type { PropType } from "vue";
 import type { SettingButton } from "../../../src/models/renderer/SettingsGroup";
 
 declare module AyayaApi {
-  function changeSetting(id: string, value: any);
+  function changeSetting(path: string, key: string, value: any);
 }
-
 export default defineComponent({
   name: "SettingButton",
-  props: { setting: Object as PropType<SettingButton> },
+  props: {
+    setting: Object as PropType<SettingButton>,
+    path: String,
+    sid: String,
+  },
   methods: {
-    onClick(setting: SettingButton) {
-      AyayaApi.changeSetting(setting.id, null);
+    onClick(path: string, sid: string, setting: SettingButton) {
+      AyayaApi.changeSetting(path, sid, undefined);
     },
   },
 });

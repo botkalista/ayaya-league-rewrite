@@ -71,29 +71,31 @@ function main() {
     });
 
     ipcMain.on('settings', (event) => {
-        const settings = ScriptsManager.getAllSettings();
+        const settings = ScriptsManager.getSettings();
         event.returnValue = settings;
     });
 
-    ipcMain.on('set-setting', (event, setting_id: string, value: any) => {
-        ScriptsManager.setSetting(setting_id, value);
+    ipcMain.on('set-setting', (event, script_path: string, key: string, value: any) => {
+        ScriptsManager.changeSetting(script_path, key, value);
         event.returnValue = true;
     });
 
     ipcMain.on('reload-scripts', (event) => {
         ScriptsManager.reloadAll();
-        const settings = ScriptsManager.getAllSettings();
+        const settings = ScriptsManager.getSettings();
         event.returnValue = settings;
     });
+
+    ipcMain.on('openDevTools', () => {
+        win.webContents.openDevTools({ mode: 'detach' });
+    })
 
     ipcMain.on('req-things-to-draw', (event) => {
         // if (!leagueState_open) return event.returnValue = false;
         Drawer.onStartDraw();
-        for (const script of ScriptsManager.scripts) {
-            script.internalFunctions.onDraw?.()
-        }
-        Drawer.onEndDraw();
-        event.returnValue = true;
+        ScriptsManager.onDraw();
+        const buffer = Drawer.onEndDraw();
+        event.returnValue = buffer;
     });
 
     // const file = path.join(__dirname, '../ui/index.html');
@@ -112,7 +114,8 @@ function main() {
 
         Reader.attach('League of Legends.exe');
 
-        const dll_path = path.join(__dirname,'AyayaDLL.dll')
+        const dll_path = path.join(__dirname, '../src/AyayaDLL.dll')
+        console.log(dll_path);
         const inject = addon.inject("League of Legends.exe", dll_path);
         await new Promise(r => setTimeout(r, 1500));
 
@@ -124,7 +127,7 @@ function main() {
         await new Promise(r => setTimeout(r, 1000));
 
         internal.openPipe('myPipe', async () => {
-            ScriptsManager.scripts.forEach(script => script.internalFunctions.onLoad?.());
+            // ScriptsManager.scripts.forEach(script => script.internalFunctions.onLoad?.());
             console.log('CORE LOOP')
             win.setAlwaysOnTop(true, "screen-saver");
             logicLoop();
@@ -139,7 +142,7 @@ function main() {
             }
             ayaya.initializeTick();
             leagueState_open = true;
-            ScriptsManager.scripts.forEach(script => script.internalFunctions.onTick?.());
+            // ScriptsManager.scripts.forEach(script => script.internalFunctions.onTick?.());
             setTimeout(() => logicLoop(), 30);
         }
 

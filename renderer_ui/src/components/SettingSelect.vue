@@ -17,7 +17,11 @@ import type { SettingSelect } from "../../../src/models/renderer/SettingsGroup";
 
 export default defineComponent({
   name: "SettingSelect",
-  props: { setting: Object as PropType<SettingSelect> },
+  props: {
+    setting: Object as PropType<SettingSelect>,
+    path: String,
+    sid: String,
+  },
 });
 </script>
 

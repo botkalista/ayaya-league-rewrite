@@ -1,12 +1,7 @@
 <template>
   <div class="setting-input">
     <div>{{ setting.text }}</div>
-    <el-input
-      :type="inputType"
-      style="font-size: 16px"
-      v-model="setting.value"
-      spellcheck="false"
-    />
+    <el-input :type="inputType" style="font-size: 16px" v-model="setting.value" spellcheck="false" />
   </div>
 </template>
 
@@ -17,7 +12,11 @@ import type { SettingInput } from "../../../src/models/renderer/SettingsGroup";
 
 export default defineComponent({
   name: "SettingInput",
-  props: { setting: Object as PropType<SettingInput> },
+  props: {
+    setting: Object as PropType<SettingInput>,
+    path: String,
+    sid: String,
+  },
   computed: {
     inputType() {
       return this.setting.multiline ? "textarea" : "text";

@@ -1,8 +1,8 @@
 <template>
-  <div class="ayaya-group" v-for="group of groups">
+  <div class="ayaya-group" v-for="(group,path) of groups">
     <div class="sTitle">{{ group.title }}</div>
     <div class="allsettings">
-      <div class="sContent" v-for="setting of group.settings">
+      <div class="sContent" v-for="(setting, settingId) of group.settings">
         <div v-if="setting.type == 'none'" style="height: 32px; align-items: center; display: flex">
           <div>{{ setting.text }}</div>
         </div>
@@ -21,30 +21,16 @@
           <div>{{ setting.value }}</div>
         </div>
 
-        <setting-boolean v-if="setting.type == 'boolean'" :setting="setting"></setting-boolean>
+        <setting-boolean v-if="setting.type == 'boolean'" :path="path" :sid="settingId" :setting="setting"></setting-boolean>
 
-        <setting-number v-if="setting.type == 'number'" :setting="setting"></setting-number>
+        <setting-number v-if="setting.type == 'number'" :path="path" :sid="settingId" :setting="setting"></setting-number>
 
-        <setting-input v-if="setting.type == 'input'" :setting="setting"></setting-input>
+        <setting-input v-if="setting.type == 'input'" :path="path" :sid="settingId" :setting="setting"></setting-input>
 
-        <setting-button v-if="setting.type == 'button'" :setting="setting"></setting-button>
+        <setting-button v-if="setting.type == 'button'" :path="path" :sid="settingId" :setting="setting"></setting-button>
 
-        <setting-select v-if="setting.type == 'select'" :setting="setting"></setting-select>
+        <setting-select v-if="setting.type == 'select'" :path="path" :sid="settingId" :setting="setting"></setting-select>
 
-        <!-- <div>{{ setting.text }}</div>
-        <div v-if="setting.type == 'none'"></div>
-
-        <div class="text" v-if="setting.type == 'text'">
-          {{ setting.value }}
-        </div>
-
-        <div v-if="setting.type == 'number'">
-          <el-input-number style="width: 110px" v-model="setting.value[2]" :min="setting.value[0]" :max="setting.value[1]" />
-        </div>
-
-        <div v-if="setting.type == 'boolean'">
-          <el-switch size="default" v-model="setting.value"></el-switch>
-        </div>-->
       </div>
     </div>
     <div class="sDesc" v-if="group.description">{{ group.description }}</div>
@@ -54,13 +40,15 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { SettingsGroup } from "../../../src/models/renderer/SettingsGroup";
+import type { Setting } from "../../../src/models/renderer/SettingsGroup";
 
 import SettingInput from "./SettingInput.vue";
 import SettingNumber from "./SettingNumber.vue";
 import SettingBoolean from "./SettingBoolean.vue";
 import SettingButton from "./SettingButton.vue";
 import SettingSelect from "./SettingSelect.vue";
+
+type SettingGroup = Setting & { title?: string; description?: string };
 
 export default defineComponent({
   components: {
@@ -71,7 +59,7 @@ export default defineComponent({
     SettingButton,
   },
   name: "Group",
-  props: { groups: Object as PropType<SettingsGroup> },
+  props: { groups: Object as PropType<SettingGroup>, path: String },
 });
 </script>
 

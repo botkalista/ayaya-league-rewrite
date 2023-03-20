@@ -18,7 +18,11 @@ import type { SettingNumber } from "../../../src/models/renderer/SettingsGroup";
 
 export default defineComponent({
   name: "SettingNumber",
-  props: { setting: Object as PropType<SettingNumber> },
+  props: {
+    setting: Object as PropType<SettingNumber>,
+    path: String,
+    sid: String,
+  },
 });
 </script>
 
